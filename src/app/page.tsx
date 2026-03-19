@@ -5,6 +5,11 @@ import { useState } from "react";
 const WritingFeedbackPage = () => {
   const [assignmentTitle, setAssignmentTitle] = useState("");
   const [draft, setDraft] = useState("");
+  const [feedback, setFeedback] = useState("");
+
+  const handleGetFeedback = () => {
+    setFeedback(`Feedback for ${assignmentTitle}`);
+  };
 
   return (
     <div>
@@ -33,12 +38,12 @@ const WritingFeedbackPage = () => {
           ></textarea>
         </div>
 
-        <button>Get Feedback</button>
+        <button onClick={handleGetFeedback}>Get Feedback</button>
       </div>
 
       <div>
         <h2>Feedback</h2>
-        <p>Feedback will appear here after submission.</p>
+        <p>{feedback || "Feedback will appear here after submission."}</p>{" "}
       </div>
     </div>
   );
