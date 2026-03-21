@@ -6,10 +6,24 @@ const WritingFeedbackPage = () => {
   const [assignmentTitle, setAssignmentTitle] = useState("");
   const [draft, setDraft] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
 
   const handleGetFeedback = () => {
-    setFeedback(`Feedback for ${assignmentTitle}`);
+    setStatus("loading");
+
+    const shouldFail = Math.random() < 0.3;
+
+    setTimeout(() => {
+      if (shouldFail) {
+        setStatus("error");
+        return;
+      }
+      setFeedback(`Feedback for ${assignmentTitle}`);
+      setStatus("idle");
+    }, 2000);
   };
+
+  const isFormValid = assignmentTitle.trim() !== "" && draft.trim() !== "";
 
   return (
     <div>
@@ -24,7 +38,10 @@ const WritingFeedbackPage = () => {
             id="assignmentTitle"
             type="text"
             value={assignmentTitle}
-            onChange={(e) => setAssignmentTitle(e.target.value)}
+            onChange={(e) => {
+              setAssignmentTitle(e.target.value);
+              setStatus("idle");
+            }}
           />
         </div>
 
@@ -34,16 +51,37 @@ const WritingFeedbackPage = () => {
             id="draft"
             rows={8}
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
+            onChange={(e) => {
+              setDraft(e.target.value);
+              setStatus("idle");
+            }}
           ></textarea>
         </div>
 
-        <button onClick={handleGetFeedback}>Get Feedback</button>
+        <button
+          onClick={handleGetFeedback}
+          disabled={status === "loading" || !isFormValid}
+        >
+          {status === "loading" ? "Generating..." : "Get Feedback"}
+        </button>
       </div>
+
+      {status === "error" && (
+        <div>
+          <p>Something went wrong. Please try again.</p>
+          <button onClick={handleGetFeedback}>Retry</button>
+        </div>
+      )}
 
       <div>
         <h2>Feedback</h2>
-        <p>{feedback || "Feedback will appear here after submission."}</p>{" "}
+        <p>
+          {status === "loading"
+            ? "Generating feedback..."
+            : feedback
+              ? feedback
+              : "Feedback will appear here after submission."}
+        </p>
       </div>
     </div>
   );
